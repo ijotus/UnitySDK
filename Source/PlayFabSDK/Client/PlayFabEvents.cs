@@ -37,6 +37,8 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<ExecuteCloudScriptResult> OnExecuteCloudScriptResultEvent;
         public event PlayFabRequestEvent<GetAccountInfoRequest> OnGetAccountInfoRequestEvent;
         public event PlayFabResultEvent<GetAccountInfoResult> OnGetAccountInfoResultEvent;
+        public event PlayFabRequestEvent<GetAdPlacementsRequest> OnGetAdPlacementsRequestEvent;
+        public event PlayFabResultEvent<GetAdPlacementsResult> OnGetAdPlacementsResultEvent;
         public event PlayFabRequestEvent<ListUsersCharactersRequest> OnGetAllUsersCharactersRequestEvent;
         public event PlayFabResultEvent<ListUsersCharactersResult> OnGetAllUsersCharactersResultEvent;
         public event PlayFabRequestEvent<GetCatalogItemsRequest> OnGetCatalogItemsRequestEvent;
@@ -190,12 +192,16 @@ namespace PlayFab.Events
         public event PlayFabResultEvent<RemoveGenericIDResult> OnRemoveGenericIDResultEvent;
         public event PlayFabRequestEvent<RemoveSharedGroupMembersRequest> OnRemoveSharedGroupMembersRequestEvent;
         public event PlayFabResultEvent<RemoveSharedGroupMembersResult> OnRemoveSharedGroupMembersResultEvent;
+        public event PlayFabRequestEvent<ReportAdActivityRequest> OnReportAdActivityRequestEvent;
+        public event PlayFabResultEvent<ReportAdActivityResult> OnReportAdActivityResultEvent;
         public event PlayFabRequestEvent<DeviceInfoRequest> OnReportDeviceInfoRequestEvent;
         public event PlayFabResultEvent<EmptyResult> OnReportDeviceInfoResultEvent;
         public event PlayFabRequestEvent<ReportPlayerClientRequest> OnReportPlayerRequestEvent;
         public event PlayFabResultEvent<ReportPlayerClientResult> OnReportPlayerResultEvent;
         public event PlayFabRequestEvent<RestoreIOSPurchasesRequest> OnRestoreIOSPurchasesRequestEvent;
         public event PlayFabResultEvent<RestoreIOSPurchasesResult> OnRestoreIOSPurchasesResultEvent;
+        public event PlayFabRequestEvent<RewardAdActivityRequest> OnRewardAdActivityRequestEvent;
+        public event PlayFabResultEvent<RewardAdActivityResult> OnRewardAdActivityResultEvent;
         public event PlayFabRequestEvent<SendAccountRecoveryEmailRequest> OnSendAccountRecoveryEmailRequestEvent;
         public event PlayFabResultEvent<SendAccountRecoveryEmailResult> OnSendAccountRecoveryEmailResultEvent;
         public event PlayFabRequestEvent<SetFriendTagsRequest> OnSetFriendTagsRequestEvent;

@@ -32,6 +32,14 @@ namespace PlayFab.ClientModels
         public TradeInfo Trade;
     }
 
+    public enum AdActivity
+    {
+        Opened,
+        Closed,
+        Start,
+        End
+    }
+
     [Serializable]
     public class AdCampaignAttributionModel
     {
@@ -162,6 +170,90 @@ namespace PlayFab.ClientModels
         /// Name of the virtual currency which is to be incremented.
         /// </summary>
         public string VirtualCurrency;
+    }
+
+    /// <summary>
+    /// A single ad placement details including placement and reward information
+    /// </summary>
+    [Serializable]
+    public class AdPlacementDetails
+    {
+        /// <summary>
+        /// Placement unique ID
+        /// </summary>
+        public string PlacementId;
+        /// <summary>
+        /// Placement name
+        /// </summary>
+        public string PlacementName;
+        /// <summary>
+        /// If placement has viewing limits indicates how many views are left
+        /// </summary>
+        public int? PlacementViewsRemaining;
+        /// <summary>
+        /// If placement has viewing limits indicates when they will next reset
+        /// </summary>
+        public double? PlacementViewsResetMinutes;
+        /// <summary>
+        /// Optional URL to a reward asset
+        /// </summary>
+        public string RewardAssetUrl;
+        /// <summary>
+        /// Reward description
+        /// </summary>
+        public string RewardDescription;
+        /// <summary>
+        /// Reward unique ID
+        /// </summary>
+        public string RewardId;
+        /// <summary>
+        /// Reward name
+        /// </summary>
+        public string RewardName;
+    }
+
+    /// <summary>
+    /// Details for each item granted
+    /// </summary>
+    [Serializable]
+    public class AdRewardItemGranted
+    {
+        /// <summary>
+        /// Catalog ID
+        /// </summary>
+        public string CatalogId;
+        /// <summary>
+        /// Catalog item display name
+        /// </summary>
+        public string DisplayName;
+        /// <summary>
+        /// Inventory instance ID
+        /// </summary>
+        public string InstanceId;
+        /// <summary>
+        /// Item ID
+        /// </summary>
+        public string ItemId;
+    }
+
+    /// <summary>
+    /// Details on what was granted to the player
+    /// </summary>
+    [Serializable]
+    public class AdRewardResults
+    {
+        /// <summary>
+        /// Array of the items granted to the player
+        /// </summary>
+        public List<AdRewardItemGranted> GrantedItems;
+        /// <summary>
+        /// Dictionary of virtual currencies that were granted to the player
+        /// </summary>
+        public Dictionary<string,int> GrantedVirtualCurrencies;
+        /// <summary>
+        /// Dictionary of statistics that were modified for the player
+        /// </summary>
+        public Dictionary<string,int> IncrementedStatistics;
     }
 
     [Serializable]
@@ -1418,6 +1510,34 @@ namespace PlayFab.ClientModels
         /// Account information for the local user.
         /// </summary>
         public UserAccountInfo AccountInfo;
+    }
+
+    /// <summary>
+    /// Using an AppId to return a list of valid ad placements for a player.
+    /// </summary>
+    [Serializable]
+    public class GetAdPlacementsRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// The current AppId to use
+        /// </summary>
+        public string AppId;
+        /// <summary>
+        /// Using the name or unique identifier, filter the result for get a specific placement.
+        /// </summary>
+        public NameIdentifier Identifier;
+    }
+
+    /// <summary>
+    /// Array of AdPlacementDetails
+    /// </summary>
+    [Serializable]
+    public class GetAdPlacementsResult : PlayFabResultCommon
+    {
+        /// <summary>
+        /// Array of results
+        /// </summary>
+        public List<AdPlacementDetails> AdPlacements;
     }
 
     [Serializable]
@@ -4259,6 +4379,34 @@ namespace PlayFab.ClientModels
     {
     }
 
+    /// <summary>
+    /// Report ad activity
+    /// </summary>
+    [Serializable]
+    public class ReportAdActivityRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Type of activity, may be Opened, Closed, Start or End
+        /// </summary>
+        public AdActivity Activity;
+        /// <summary>
+        /// Unique ID of the placement to report for
+        /// </summary>
+        public string PlacementId;
+        /// <summary>
+        /// Unique ID of the reward the player was offered
+        /// </summary>
+        public string RewardId;
+    }
+
+    /// <summary>
+    /// Report ad activity response has no body
+    /// </summary>
+    [Serializable]
+    public class ReportAdActivityResult : PlayFabResultCommon
+    {
+    }
+
     [Serializable]
     public class ReportPlayerClientRequest : PlayFabRequestCommon
     {
@@ -4293,6 +4441,58 @@ namespace PlayFab.ClientModels
     [Serializable]
     public class RestoreIOSPurchasesResult : PlayFabResultCommon
     {
+    }
+
+    /// <summary>
+    /// Details on which placement and reward to perform a grant on
+    /// </summary>
+    [Serializable]
+    public class RewardAdActivityRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Placement unique ID
+        /// </summary>
+        public string PlacementId;
+        /// <summary>
+        /// Reward unique ID
+        /// </summary>
+        public string RewardId;
+    }
+
+    /// <summary>
+    /// Result for rewarding an ad activity
+    /// </summary>
+    [Serializable]
+    public class RewardAdActivityResult : PlayFabResultCommon
+    {
+        /// <summary>
+        /// PlayStream Event ID that was generated by this reward (all subsequent events are associated with this event identifier)
+        /// </summary>
+        public string AdActivityEventId;
+        /// <summary>
+        /// Debug results from the grants
+        /// </summary>
+        public List<string> DebugResults;
+        /// <summary>
+        /// Id of the placement the reward was for
+        /// </summary>
+        public string PlacementId;
+        /// <summary>
+        /// Name of the placement the reward was for
+        /// </summary>
+        public string PlacementName;
+        /// <summary>
+        /// If placement has viewing limits indicates how many views are left
+        /// </summary>
+        public int? PlacementViewsRemaining;
+        /// <summary>
+        /// If placement has viewing limits indicates when they will next reset
+        /// </summary>
+        public double? PlacementViewsResetMinutes;
+        /// <summary>
+        /// Reward results
+        /// </summary>
+        public AdRewardResults RewardResults;
     }
 
     [Serializable]
