@@ -1,7 +1,10 @@
 #if !DISABLE_PLAYFABCLIENT_API && ENABLE_PLAYFABENTITY_API
 using PlayFab.EntityModels;
 using PlayFab.Internal;
+using System;
 using System.Collections.Generic;
+using PlayFab.Json;
+using UnityEngine;
 
 namespace PlayFab.UUnit
 {

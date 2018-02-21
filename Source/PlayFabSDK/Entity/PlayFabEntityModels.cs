@@ -45,26 +45,7 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class AcceptGroupInviteRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// Optional: ID of the entity that was invited. If specified, this must be the same entity as the claimant or an entity
-        /// that is a child of the claimant entity. Defaults to the claimant entity.
-        /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Optional. Type of the entity that was invited. If specified, must be the same entity as the claimant or an entity that
-        /// is a child of the claimant entity. Defaults to the claimant entity.
-        /// </summary>
-        public string EntityType;
-        /// <summary>
-        /// ID of the group to accept the invite of
-        /// </summary>
-        public string GroupId;
-    }
-
-    [Serializable]
-    public class AcceptGroupJoinRequestRequest : PlayFabRequestCommon
+    public class AcceptGroupApplicationRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// Optional: ID of the entity to accept as. If specified, this must be the same entity as the claimant or an entity that is
@@ -91,7 +72,24 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class AddGroupMembersRequest : PlayFabRequestCommon
+    public class AcceptGroupInvitationRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Entity profile ID.
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Entity type.
+        /// </summary>
+        public EntityTypes EntityType;
+        /// <summary>
+        /// ID of the group to accept the invite of
+        /// </summary>
+        public string GroupId;
+    }
+
+    [Serializable]
+    public class AddMembersRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// ID of the group that the entities are being added to
@@ -102,41 +100,35 @@ namespace PlayFab.EntityModels
         /// </summary>
         public List<EntityTypeId> Members;
         /// <summary>
-        /// Optional: The ID of the role to add the entities to. If this is not specified, the default member role for the group
-        /// will be used.
+        /// Optional: The ID of the existing role to add the entities to. If this is not specified, the default member role for the
+        /// group will be used. Role IDs must be between 1 and 64 characters long.
         /// </summary>
         public string RoleId;
-        /// <summary>
-        /// Optional: The name of the role to add the entities to. If this is not specified, the default member role for the group
-        /// will be used.
-        /// </summary>
-        public string RoleName;
     }
 
     [Serializable]
-    public class AddRoleMembersRequest : PlayFabRequestCommon
+    public class ApplyToGroupRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// ID of the group that the entities are being added to. If the entities are not already members of the group, adding them
-        /// to a role within the group will also add them to the group.
+        /// Optional, default true. Automatically accept an outstanding invitation if one exists instead of creating an application
+        /// </summary>
+        public bool? AutoAcceptOutstandingInvite;
+        /// <summary>
+        /// Entity profile ID.
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Entity type.
+        /// </summary>
+        public EntityTypes? EntityType;
+        /// <summary>
+        /// ID of the group to submit an application to
         /// </summary>
         public string GroupId;
-        /// <summary>
-        /// List of entities to add to the role. Only entities of type title_player_account and character may be added to roles.
-        /// </summary>
-        public List<EntityTypeId> Members;
-        /// <summary>
-        /// The ID of the role to add the entities to.
-        /// </summary>
-        public string RoleId;
-        /// <summary>
-        /// The name of the role to add the entities to.
-        /// </summary>
-        public string RoleName;
     }
 
     [Serializable]
-    public class CreateGroupBlockRequest : PlayFabRequestCommon
+    public class BlockEntityRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// Entity profile ID.
@@ -153,12 +145,8 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class CreateGroupInviteRequest : PlayFabRequestCommon
+    public class CreateGroupRequest : PlayFabRequestCommon
     {
-        /// <summary>
-        /// Optional, default true. Automatically accept an join request if one exists instead of creating an invitation
-        /// </summary>
-        public bool? AutoAcceptOutstandingJoinRequest;
         /// <summary>
         /// Entity profile ID.
         /// </summary>
@@ -166,84 +154,47 @@ namespace PlayFab.EntityModels
         /// <summary>
         /// Entity type.
         /// </summary>
-        public EntityTypes EntityType;
-        /// <summary>
-        /// ID of the group to invite to
-        /// </summary>
-        public string GroupId;
-        /// <summary>
-        /// Optional. ID of an existing a role in the group to assign the user to. The group's default member role is used if this
-        /// is not specified
-        /// </summary>
-        public string RoleId;
-        /// <summary>
-        /// Optional. Name of an existing a role in the group to assign the user to. The group's default member role is used if this
-        /// is not specified
-        /// </summary>
-        public string RoleName;
-    }
-
-    [Serializable]
-    public class CreateGroupRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// Optional: Entity id of the entity to set as the administrator of the group. Defaults to the entity provided by the
-        /// authentication token, and must be a child of the calling entity. EntityType is also required if this is set.
-        /// </summary>
-        public string AdminEntityId;
-        /// <summary>
-        /// Optional: Entity type of the entity to set as the administrator of the group. Defaults to the entity provided by the
-        /// authentication token, and must be a child of the calling entity. EntityId is also required if this is set.
-        /// </summary>
-        public string AdminEntityType;
-        /// <summary>
-        /// Optional: Skips checking to ensure that the group name is unique at the title level.
-        /// </summary>
-        public bool? AllowDuplicateName;
+        public EntityTypes? EntityType;
         /// <summary>
         /// The name of the group. This is unique at the title level by default.
         /// </summary>
-        public string DisplayName;
+        public string GroupName;
     }
 
     [Serializable]
     public class CreateGroupRoleRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// Optional. An access policy to apply to the role. If not provided, the default role access policy will be used.
-        /// </summary>
-        public string AccessPolicy;
-        /// <summary>
-        /// The name of the role. This must be unique within the group.
-        /// </summary>
-        public string DisplayName;
-        /// <summary>
         /// The ID of the group to create the role in
         /// </summary>
         public string GroupId;
+        /// <summary>
+        /// The ID of the role. This must be unique within the group and cannot be changed. Role IDs must be between 1 and 64
+        /// characters long.
+        /// </summary>
+        public string RoleId;
+        /// <summary>
+        /// The name of the role. This must be unique within the group and can be changed later. Role names must be between 1 and
+        /// 100 characters long
+        /// </summary>
+        public string RoleName;
     }
 
     [Serializable]
-    public class CreateJoinRequestRequest : PlayFabRequestCommon
+    public class CreateGroupRoleResponse : PlayFabResultCommon
     {
         /// <summary>
-        /// Optional, default true. Automatically accept an outstanding invitation if one exists instead of creating a join request
+        /// The current version of the group profile, can be used for concurrency control during updates.
         /// </summary>
-        public bool? AutoAcceptOutstandingInvite;
+        public int ProfileVersion;
         /// <summary>
-        /// Optional: ID of the entity to create the request for. Defaults to the entity provided by the authentication token, but
-        /// must be a child of the calling entity if set. EntityType is also required if this is set.
+        /// ID for the role
         /// </summary>
-        public string EntityId;
+        public string RoleId;
         /// <summary>
-        /// Optional: Type of entity to create the request for. Defaults to the entity provided by the authentication token, but
-        /// must be a child of the calling entity if set. EntityId is also required if this is set.
+        /// The name of the role
         /// </summary>
-        public string EntityType;
-        /// <summary>
-        /// ID of the group to submit a request to join to
-        /// </summary>
-        public string GroupId;
+        public string RoleName;
     }
 
     [Serializable]
@@ -295,40 +246,6 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class DeleteInviteRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// Entity profile ID.
-        /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Entity type.
-        /// </summary>
-        public EntityTypes EntityType;
-        /// <summary>
-        /// ID of the group that the entity was invited to
-        /// </summary>
-        public string GroupId;
-    }
-
-    [Serializable]
-    public class DeleteJoinRequestRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// Entity profile ID.
-        /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Entity type.
-        /// </summary>
-        public EntityTypes EntityType;
-        /// <summary>
-        /// ID of the group that the entity is requesting membership to
-        /// </summary>
-        public string GroupId;
-    }
-
-    [Serializable]
     public class DeleteRoleRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -336,13 +253,9 @@ namespace PlayFab.EntityModels
         /// </summary>
         public string GroupId;
         /// <summary>
-        /// The ID of the role to delete
+        /// The ID of the role to delete. Role IDs must be between 1 and 64 characters long.
         /// </summary>
         public string RoleId;
-        /// <summary>
-        /// The name of the role to delete
-        /// </summary>
-        public string RoleName;
     }
 
     public enum EffectType
@@ -540,8 +453,7 @@ namespace PlayFab.EntityModels
         namespace_player_account,
         title_player_account,
         character,
-        group,
-        group_role
+        group
     }
 
     [Serializable]
@@ -703,18 +615,22 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class GetGroupBlockResponse : PlayFabResultCommon
+    public class GetGroupApplicationResponse : PlayFabResultCommon
     {
         /// <summary>
-        /// ID of the entity that is blocked
+        /// ID of the entity that requested membership
         /// </summary>
         public string EntityId;
         /// <summary>
-        /// Type of entity that is blocked
+        /// Type of entity that requested membership
         /// </summary>
         public string EntityType;
         /// <summary>
-        /// ID of the group that the entity is blocked from
+        /// When the application to join will expire and be deleted
+        /// </summary>
+        public DateTime Expires;
+        /// <summary>
+        /// ID of the group that the entity requesting membership to
         /// </summary>
         public string GroupId;
     }
@@ -733,7 +649,7 @@ namespace PlayFab.EntityModels
         /// <summary>
         /// When the invitation will expire and be deleted
         /// </summary>
-        public DateTime Expiry;
+        public DateTime Expires;
         /// <summary>
         /// ID of the group that the entity invited to
         /// </summary>
@@ -750,27 +666,6 @@ namespace PlayFab.EntityModels
         /// ID of the role in the group to assign the user to.
         /// </summary>
         public string RoleId;
-    }
-
-    [Serializable]
-    public class GetGroupJoinRequestResponse : PlayFabResultCommon
-    {
-        /// <summary>
-        /// ID of the entity that requested membership
-        /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Type of entity that requested membership
-        /// </summary>
-        public string EntityType;
-        /// <summary>
-        /// When the request to join will expire and be deleted
-        /// </summary>
-        public DateTime Expiry;
-        /// <summary>
-        /// ID of the group that the entity requesting membership to
-        /// </summary>
-        public string GroupId;
     }
 
     [Serializable]
@@ -794,13 +689,13 @@ namespace PlayFab.EntityModels
         /// </summary>
         public DateTime Created;
         /// <summary>
-        /// The name of the group.
-        /// </summary>
-        public string DisplayName;
-        /// <summary>
         /// ID for the group.
         /// </summary>
         public string GroupId;
+        /// <summary>
+        /// The name of the group.
+        /// </summary>
+        public string GroupName;
         /// <summary>
         /// The ID of the default member role for the group.
         /// </summary>
@@ -813,40 +708,6 @@ namespace PlayFab.EntityModels
         /// The list of roles and names that belong to the group.
         /// </summary>
         public Dictionary<string,string> Roles;
-    }
-
-    [Serializable]
-    public class GetGroupRoleRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// The ID of the group containing the role
-        /// </summary>
-        public string GroupId;
-        /// <summary>
-        /// The ID of the role
-        /// </summary>
-        public string RoleId;
-        /// <summary>
-        /// The name of the role
-        /// </summary>
-        public string RoleName;
-    }
-
-    [Serializable]
-    public class GetGroupRoleResponse : PlayFabResultCommon
-    {
-        /// <summary>
-        /// The name of the role
-        /// </summary>
-        public string DisplayName;
-        /// <summary>
-        /// The current version of the profile, can be used for concurrency control during updates.
-        /// </summary>
-        public int ProfileVersion;
-        /// <summary>
-        /// ID for the role
-        /// </summary>
-        public string RoleId;
     }
 
     [Serializable]
@@ -889,16 +750,100 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class GroupWithRoles
+    public class GroupApplication
     {
         /// <summary>
-        /// The name of the group
+        /// ID of the entity that requested membership
         /// </summary>
-        public string DisplayName;
+        public string EntityId;
+        /// <summary>
+        /// Type of entity that requested membership
+        /// </summary>
+        public string EntityType;
+        /// <summary>
+        /// When the application to join will expire and be deleted
+        /// </summary>
+        public DateTime Expires;
+        /// <summary>
+        /// ID of the group that the entity requesting membership to
+        /// </summary>
+        public string GroupId;
+    }
+
+    [Serializable]
+    public class GroupBlock
+    {
+        /// <summary>
+        /// ID of the entity that is blocked
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Type of entity that is blocked
+        /// </summary>
+        public string EntityType;
+        /// <summary>
+        /// ID of the group that the entity is blocked from
+        /// </summary>
+        public string GroupId;
+    }
+
+    [Serializable]
+    public class GroupInvite
+    {
+        /// <summary>
+        /// ID of the entity that is invited
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Type of entity that is invited
+        /// </summary>
+        public string EntityType;
+        /// <summary>
+        /// When the invitation will expire and be deleted
+        /// </summary>
+        public DateTime Expires;
+        /// <summary>
+        /// ID of the group that the entity invited to
+        /// </summary>
+        public string GroupId;
+        /// <summary>
+        /// ID of the entity that created the invitation
+        /// </summary>
+        public string InvitedById;
+        /// <summary>
+        /// Type of the entity that created the invitation
+        /// </summary>
+        public string InvitedByType;
+        /// <summary>
+        /// ID of the role in the group to assign the user to.
+        /// </summary>
+        public string RoleId;
+    }
+
+    [Serializable]
+    public class GroupRole
+    {
+        /// <summary>
+        /// ID for the role
+        /// </summary>
+        public string RoleId;
+        /// <summary>
+        /// The name of the role
+        /// </summary>
+        public string RoleName;
+    }
+
+    [Serializable]
+    public class GroupWithRoles
+    {
         /// <summary>
         /// ID for the group
         /// </summary>
         public string GroupId;
+        /// <summary>
+        /// The name of the group
+        /// </summary>
+        public string GroupName;
         /// <summary>
         /// The current version of the profile, can be used for concurrency control during updates.
         /// </summary>
@@ -906,7 +851,7 @@ namespace PlayFab.EntityModels
         /// <summary>
         /// The list of roles within the group
         /// </summary>
-        public List<GetGroupRoleResponse> Roles;
+        public List<GroupRole> Roles;
     }
 
     [Serializable]
@@ -966,8 +911,12 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class IsMemberOfGroupRequest : PlayFabRequestCommon
+    public class InviteToGroupRequest : PlayFabRequestCommon
     {
+        /// <summary>
+        /// Optional, default true. Automatically accept an application if one exists instead of creating an invitation
+        /// </summary>
+        public bool? AutoAcceptOutstandingApplication;
         /// <summary>
         /// Entity profile ID.
         /// </summary>
@@ -977,47 +926,40 @@ namespace PlayFab.EntityModels
         /// </summary>
         public EntityTypes EntityType;
         /// <summary>
-        /// ID of the group
-        /// </summary>
-        public string GroupId;
-    }
-
-    [Serializable]
-    public class IsMemberOfGroupResponse : PlayFabResultCommon
-    {
-        /// <summary>
-        /// A value indicating whether or not the entity is a member.
-        /// </summary>
-        public bool IsMember;
-    }
-
-    [Serializable]
-    public class IsMemberOfRoleRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// Entity profile ID.
-        /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Entity type.
-        /// </summary>
-        public EntityTypes EntityType;
-        /// <summary>
-        /// ID of the group
+        /// ID of the group to invite to
         /// </summary>
         public string GroupId;
         /// <summary>
-        /// ID of the role
+        /// Optional. ID of an existing a role in the group to assign the user to. The group's default member role is used if this
+        /// is not specified. Role IDs must be between 1 and 64 characters long.
         /// </summary>
         public string RoleId;
-        /// <summary>
-        /// Name of the role
-        /// </summary>
-        public string RoleName;
     }
 
     [Serializable]
-    public class IsMemberOfRoleResponse : PlayFabResultCommon
+    public class IsMemberRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Entity profile ID.
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Entity type.
+        /// </summary>
+        public EntityTypes EntityType;
+        /// <summary>
+        /// ID of the group to check membership of.
+        /// </summary>
+        public string GroupId;
+        /// <summary>
+        /// Optional: ID of the role to check membership of. Defaults to any role (that is, check to see if the entity is a member
+        /// of the group in any capacity) if not specified.
+        /// </summary>
+        public string RoleId;
+    }
+
+    [Serializable]
+    public class IsMemberResponse : PlayFabResultCommon
     {
         /// <summary>
         /// A value indicating whether or not the entity is a member.
@@ -1026,27 +968,21 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class ListGroupAndRoleResponse : PlayFabResultCommon
+    public class ListGroupApplicationResponse : PlayFabResultCommon
     {
         /// <summary>
-        /// The list of groups
+        /// The requested list of applications to the group.
         /// </summary>
-        public List<GroupWithRoles> Groups;
+        public List<GroupApplication> Requests;
     }
 
     [Serializable]
-    public class ListGroupAndRolesMembershipRequest : PlayFabRequestCommon
+    public class ListGroupApplicationsRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// Entity profile ID to list groups and roles of. If not specified, the groups and roles for the current claimant are
-        /// returned.
+        /// ID of the group to list applications for
         /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Optional: Entity type to list groups and roles of. If not specified, the groups and roles for the current claimant are
-        /// returned.
-        /// </summary>
-        public EntityTypes? EntityType;
+        public string GroupId;
     }
 
     [Serializable]
@@ -1064,7 +1000,7 @@ namespace PlayFab.EntityModels
         /// <summary>
         /// The requested list blocked entities.
         /// </summary>
-        public List<GetGroupBlockResponse> BlockedEntities;
+        public List<GroupBlock> BlockedEntities;
     }
 
     [Serializable]
@@ -1082,29 +1018,11 @@ namespace PlayFab.EntityModels
         /// <summary>
         /// The requested list of group invitations.
         /// </summary>
-        public List<GetGroupInviteResponse> Invitations;
+        public List<GroupInvite> Invitations;
     }
 
     [Serializable]
-    public class ListGroupJoinRequestRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// ID of the group to list requests to join for
-        /// </summary>
-        public string GroupId;
-    }
-
-    [Serializable]
-    public class ListGroupJoinRequestResponse : PlayFabResultCommon
-    {
-        /// <summary>
-        /// The requested list of requests to join the group.
-        /// </summary>
-        public List<GetGroupJoinRequestResponse> Requests;
-    }
-
-    [Serializable]
-    public class ListGroupMembersByRoleRequest : PlayFabRequestCommon
+    public class ListGroupMembersRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// ID of the group or role to list the members and roles for
@@ -1113,7 +1031,7 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class ListGroupMembersByRoleResponse : PlayFabResultCommon
+    public class ListGroupMembersResponse : PlayFabResultCommon
     {
         /// <summary>
         /// The requested list of roles and member entity IDs.
@@ -1122,83 +1040,51 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class ListGroupMembersRequest : PlayFabRequestCommon
+    public class ListMembershipOpportunitiesRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// ID of the group or role to list the members of
+        /// Entity profile ID.
         /// </summary>
-        public string GroupId;
+        public string EntityId;
+        /// <summary>
+        /// Entity type.
+        /// </summary>
+        public EntityTypes? EntityType;
     }
 
     [Serializable]
-    public class ListGroupMembersResponse : PlayFabResultCommon
+    public class ListMembershipOpportunitiesResponse : PlayFabResultCommon
     {
         /// <summary>
-        /// The requested list of group member entity IDs.
+        /// The requested list of group applications.
         /// </summary>
-        public List<EntityMember> Members;
-    }
-
-    [Serializable]
-    public class ListGroupRolesRequest : PlayFabRequestCommon
-    {
-        /// <summary>
-        /// Type of group to list block entities of
-        /// </summary>
-        public string GroupId;
-    }
-
-    [Serializable]
-    public class ListGroupRolesResponse : PlayFabResultCommon
-    {
-        /// <summary>
-        /// The requested list of group roles.
-        /// </summary>
-        public List<GetGroupRoleResponse> Roles;
-    }
-
-    [Serializable]
-    public class ListMyJoinRequestsAndInvitesRequest : PlayFabRequestCommon
-    {
-    }
-
-    [Serializable]
-    public class ListMyJoinRequestsAndInvitesResponse : PlayFabResultCommon
-    {
+        public List<GroupApplication> Applications;
         /// <summary>
         /// The requested list of group invitations.
         /// </summary>
-        public List<GetGroupInviteResponse> Invitations;
-        /// <summary>
-        /// The requested list of group join requests.
-        /// </summary>
-        public List<GetGroupJoinRequestResponse> JoinRequests;
+        public List<GroupInvite> Invitations;
     }
 
     [Serializable]
-    public class ListRoleMembersRequest : PlayFabRequestCommon
+    public class ListMembershipRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// ID of the group or role to list the members of a role for
+        /// Entity profile ID.
         /// </summary>
-        public string GroupId;
+        public string EntityId;
         /// <summary>
-        /// ID of the role to list the members of
+        /// Entity type.
         /// </summary>
-        public string RoleId;
-        /// <summary>
-        /// The name of the role to list the members of
-        /// </summary>
-        public string RoleName;
+        public EntityTypes? EntityType;
     }
 
     [Serializable]
-    public class ListRoleMembersResponse : PlayFabResultCommon
+    public class ListMembershipResponse : PlayFabResultCommon
     {
         /// <summary>
-        /// The requested list of role member entity IDs.
+        /// The list of groups
         /// </summary>
-        public List<EntityMember> Members;
+        public List<GroupWithRoles> Groups;
     }
 
     [Serializable]
@@ -1247,7 +1133,7 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class RemoveGroupBlockRequest : PlayFabRequestCommon
+    public class RemoveGroupApplicationRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// Entity profile ID.
@@ -1258,26 +1144,30 @@ namespace PlayFab.EntityModels
         /// </summary>
         public EntityTypes EntityType;
         /// <summary>
-        /// ID of the group that the entities are being unblocked from
+        /// ID of the group that the entity is requesting membership to
         /// </summary>
         public string GroupId;
     }
 
     [Serializable]
-    public class RemoveGroupMembersRequest : PlayFabRequestCommon
+    public class RemoveGroupInvitationRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// ID of the group that the entities are being removed from
+        /// Entity profile ID.
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Entity type.
+        /// </summary>
+        public EntityTypes EntityType;
+        /// <summary>
+        /// ID of the group that the entity was invited to
         /// </summary>
         public string GroupId;
-        /// <summary>
-        /// List of entities to remove
-        /// </summary>
-        public List<EntityTypeId> Members;
     }
 
     [Serializable]
-    public class RemoveRoleMembersRequest : PlayFabRequestCommon
+    public class RemoveMembersRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// ID of the group that the entities are being removed from. If this is the only role the entities are a member of,
@@ -1292,10 +1182,6 @@ namespace PlayFab.EntityModels
         /// The ID of the role to remove the entities from.
         /// </summary>
         public string RoleId;
-        /// <summary>
-        /// The name of the role to remove the entities from.
-        /// </summary>
-        public string RoleName;
     }
 
     [Serializable]
@@ -1432,24 +1318,29 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
+    public class UnblockEntityRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Entity profile ID.
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Entity type.
+        /// </summary>
+        public EntityTypes EntityType;
+        /// <summary>
+        /// ID of the group that the entities are being unblocked from
+        /// </summary>
+        public string GroupId;
+    }
+
+    [Serializable]
     public class UpdateGroupRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// Optional: the ID of an existing role to set as the new administrator role for the group
         /// </summary>
         public string AdminRoleId;
-        /// <summary>
-        /// Optional: the name of an existing role to set as the new administrator role for the group
-        /// </summary>
-        public string AdminRoleName;
-        /// <summary>
-        /// Optional: Skips checking to ensure that the group name is unique at the title level.
-        /// </summary>
-        public bool? AllowDuplicateName;
-        /// <summary>
-        /// Optional: the new name of the group
-        /// </summary>
-        public string DisplayName;
         /// <summary>
         /// Optional field used for concurrency control. By specifying the previously returned value of ProfileVersion from the
         /// GetGroup API, you can ensure that the group data update will only be performed if the group has not been updated by any
@@ -1461,13 +1352,13 @@ namespace PlayFab.EntityModels
         /// </summary>
         public string GroupId;
         /// <summary>
+        /// Optional: the new name of the group
+        /// </summary>
+        public string GroupName;
+        /// <summary>
         /// Optional: the ID of an existing role to set as the new member role for the group
         /// </summary>
         public string MemberRoleId;
-        /// <summary>
-        /// Optional: the name of an existing role to set as the new member role for the group
-        /// </summary>
-        public string MemberRoleName;
     }
 
     [Serializable]
@@ -1491,10 +1382,6 @@ namespace PlayFab.EntityModels
     public class UpdateGroupRoleRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// The new name of the role
-        /// </summary>
-        public string DisplayName;
-        /// <summary>
         /// Optional field used for concurrency control. By specifying the previously returned value of ProfileVersion from the
         /// GetGroup API, you can ensure that the group data update will only be performed if the group has not been updated by any
         /// other clients since the version you last loaded.
@@ -1505,11 +1392,11 @@ namespace PlayFab.EntityModels
         /// </summary>
         public string GroupId;
         /// <summary>
-        /// ID of the role to update
+        /// ID of the role to update. Role IDs must be between 1 and 64 characters long.
         /// </summary>
         public string RoleId;
         /// <summary>
-        /// Name of the role to update
+        /// The new name of the role
         /// </summary>
         public string RoleName;
     }
