@@ -67,7 +67,7 @@ namespace PlayFab.UUnit
         /// Try to deliberately log in with an inappropriate password,
         ///   and verify that the error displays as expected.
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void InvalidLogin(UUnitTestContext testContext)
         {
             // If the setup failed to log in a user, we need to create one.
@@ -98,7 +98,7 @@ namespace PlayFab.UUnit
         /// Try to deliberately register a user with an invalid email and password.
         ///   Verify that errorDetails are populated correctly.
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void InvalidRegistration(UUnitTestContext testContext)
         {
             var registerRequest = new RegisterPlayFabUserRequest
@@ -130,7 +130,7 @@ namespace PlayFab.UUnit
         /// CLIENT API
         /// Log in or create a user, track their PlayFabId
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void LoginOrRegister(UUnitTestContext testContext)
         {
             var loginRequest = new LoginWithCustomIDRequest
@@ -153,7 +153,7 @@ namespace PlayFab.UUnit
         /// CLIENT API
         /// Test that the login call sequence sends the AdvertisingId when set
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void LoginWithAdvertisingId(UUnitTestContext testContext)
         {
 #if (!UNITY_IOS && !UNITY_ANDROID) || (!UNITY_5_3 && !UNITY_5_4 && !UNITY_5_5)
@@ -193,7 +193,7 @@ namespace PlayFab.UUnit
         /// Verify that the data is correctly modified on the next call.
         /// Parameter types tested: string, Dictionary&lt;string, string>, DateTime
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void UserDataApi(UUnitTestContext testContext)
         {
             var getRequest = new GetUserDataRequest();
@@ -252,7 +252,7 @@ namespace PlayFab.UUnit
         /// Verify that the data is saved correctly, and that specific types are tested
         /// Parameter types tested: Dictionary&lt;string, int>
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void PlayerStatisticsApi(UUnitTestContext testContext)
         {
             var getRequest = new GetPlayerStatisticsRequest();
@@ -301,7 +301,7 @@ namespace PlayFab.UUnit
         /// Get or create the given test character for the given user
         /// Parameter types tested: Contained-Classes, string
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void UserCharacter(UUnitTestContext testContext)
         {
             var request = new ListUsersCharactersRequest
@@ -320,7 +320,7 @@ namespace PlayFab.UUnit
         /// Test that leaderboard results can be requested
         /// Parameter types tested: List of contained-classes
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void ClientLeaderBoard(UUnitTestContext testContext)
         {
             var clientRequest = new GetLeaderboardRequest
@@ -343,7 +343,7 @@ namespace PlayFab.UUnit
         /// Test that AccountInfo can be requested
         /// Parameter types tested: List of enum-as-strings converted to list of enums
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void AccountInfo(UUnitTestContext testContext)
         {
             var request = new GetAccountInfoRequest
@@ -368,7 +368,7 @@ namespace PlayFab.UUnit
         /// CLIENT API
         /// Test that CloudScript can be properly set up and invoked
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void CloudScript(UUnitTestContext testContext)
         {
             var request = new ExecuteCloudScriptRequest
@@ -391,7 +391,7 @@ namespace PlayFab.UUnit
         /// CLIENT API
         /// Test that CloudScript errors can be deciphered
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void CloudScriptError(UUnitTestContext testContext)
         {
             var request = new ExecuteCloudScriptRequest
@@ -413,7 +413,7 @@ namespace PlayFab.UUnit
         /// CLIENT API
         /// Test that CloudScript can be properly set up and invoked
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void CloudScriptGeneric(UUnitTestContext testContext)
         {
             var request = new ExecuteCloudScriptRequest
@@ -439,7 +439,7 @@ namespace PlayFab.UUnit
         /// CLIENT API
         /// Test that the client can publish custom PlayStream events
         /// </summary>
-        [UUnitTest]
+        // [UUnitTest]
         public void WriteEvent(UUnitTestContext testContext)
         {
             var request = new WriteClientPlayerEventRequest

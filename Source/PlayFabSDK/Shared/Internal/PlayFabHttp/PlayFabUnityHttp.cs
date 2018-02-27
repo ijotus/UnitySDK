@@ -176,7 +176,7 @@ namespace PlayFab.Internal
                 {
                     if (reqContainer.ErrorCallback != null)
                     {
-                        reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiEndpoint, response, reqContainer.CustomData);
+                        reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiRequest, reqContainer.ApiEndpoint, response, reqContainer.CustomData);
                         PlayFabHttp.SendErrorEvent(reqContainer.ApiRequest, reqContainer.Error);
                         reqContainer.ErrorCallback(reqContainer.Error);
                     }
@@ -193,7 +193,7 @@ namespace PlayFab.Internal
             reqContainer.JsonResponse = error;
             if (reqContainer.ErrorCallback != null)
             {
-                reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiEndpoint, reqContainer.JsonResponse, reqContainer.CustomData);
+                reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiRequest, reqContainer.ApiEndpoint, reqContainer.JsonResponse, reqContainer.CustomData);
                 PlayFabHttp.SendErrorEvent(reqContainer.ApiRequest, reqContainer.Error);
                 reqContainer.ErrorCallback(reqContainer.Error);
             }

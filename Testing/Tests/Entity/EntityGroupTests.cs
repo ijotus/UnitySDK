@@ -1,29 +1,43 @@
-﻿#if !DISABLE_PLAYFABCLIENT_API && ENABLE_PLAYFABENTITY_API
-
 using System.Collections.Generic;
+
+#if !DISABLE_PLAYFABCLIENT_API && ENABLE_PLAYFABSERVER_API && ENABLE_PLAYFABENTITY_API
 
 namespace PlayFab.UUnit
 {
     public class EntityGroupTests : UUnitTestCase
     {
-        private TestTitleDataLoader.TestTitleData testTitleData;
+        private TestTitleDataLoader.TestTitleData _testTitleData;
+
+        private const string TestGroupName = "TestGroup";
 
         // Test variables
+        private int _testInteger;
+        private string _playFabId;
         private string _playerEntityId;
-        private List<string> _memberCharacterIds;
+        private string _groupId;
+        private readonly string[] _characterNames = { "Ragnar", "Alena", "Brey" };
+        private readonly Dictionary<string, string> _charIdbyName = new Dictionary<string, string>();
+
+        public override void ClassSetUp()
+        {
+            PlayFabEntityAPI.ForgetAllCredentials();
+        }
 
         public override void SetUp(UUnitTestContext testContext)
         {
-            testTitleData = TestTitleDataLoader.LoadTestTitleData();
+            if (string.IsNullOrEmpty(PlayFabSettings.DeveloperSecretKey))
+                testContext.Fail("Cannot get a title token without the devSecretKey.");
+
+            _testTitleData = TestTitleDataLoader.LoadTestTitleData();
 
             // Verify all the inputs won't cause crashes in the tests
             var titleInfoSet = !string.IsNullOrEmpty(PlayFabSettings.TitleId);
             if (!titleInfoSet)
                 testContext.Skip(); // We cannot do client tests if the titleId is not given
 
-            if (testTitleData.extraHeaders != null)
-                foreach (var pair in testTitleData.extraHeaders)
-                    PlayFab.Internal.PlayFabHttp.GlobalHeaderInjection[pair.Key] = pair.Value;
+            if (_testTitleData.extraHeaders != null)
+                foreach (var pair in _testTitleData.extraHeaders)
+                    Internal.PlayFabHttp.GlobalHeaderInjection[pair.Key] = pair.Value;
         }
 
         public override void Tick(UUnitTestContext testContext)
@@ -31,12 +45,18 @@ namespace PlayFab.UUnit
             // Do nothing, because the test finishes asynchronously
         }
 
+        public override void TearDown(UUnitTestContext testContext)
+        {
+            if (PlayFabClientAPI.IsClientLoggedIn())
+                testContext.Fail("This test suite should not result in a permanent client login.");
+        }
+
         public override void ClassTearDown()
         {
             PlayFabEntityAPI.ForgetAllCredentials();
         }
 
-        private void SharedErrorCallback(PlayFabError error)
+        private void OnSharedError(PlayFabError error)
         {
             // This error was not expected.  Report it and fail.
             ((UUnitTestContext)error.CustomData).Fail(error.GenerateErrorReport());
@@ -49,31 +69,198 @@ namespace PlayFab.UUnit
             {
                 CustomId = PlayFabSettings.BuildIdentifier,
                 CreateAccount = true,
+                LoginTitlePlayerAccountEntity = true
             };
-            PlayFabClientAPI.LoginWithCustomID(loginRequest, PlayFabUUnitUtils.ApiActionWrapper<ClientModels.LoginResult>(testContext, LoginCallback), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, SharedErrorCallback), testContext);
+            PlayFabClientAPI.LoginWithCustomID(loginRequest, PlayFabUUnitUtils.ApiActionWrapper<ClientModels.LoginResult>(testContext, OnLogin), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
         }
-        private void LoginCallback(ClientModels.LoginResult result)
+        private void OnLogin(ClientModels.LoginResult result)
         {
             var testContext = (UUnitTestContext)result.CustomData;
             testContext.True(PlayFabClientAPI.IsClientLoggedIn(), "User login failed");
+            _playerEntityId = result.EntityToken.EntityId;
+            _playFabId = result.PlayFabId;
+
+            PlayFabClientAPI.ForgetAllCredentials(); // I don't want to be logged in as a client, I just want the IDs.
             testContext.EndTest(UUnitFinishState.PASSED, PlayFabSettings.TitleId + ", " + result.PlayFabId);
         }
 
         [UUnitTest]
-        public void GetEntityToken(UUnitTestContext testContext)
+        public void GetTitleEntityToken(UUnitTestContext testContext)
         {
-            var tokenRequest = new PlayFab.EntityModels.GetEntityTokenRequest();
-            PlayFabEntityAPI.GetEntityToken(tokenRequest, PlayFabUUnitUtils.ApiActionWrapper<PlayFab.EntityModels.GetEntityTokenResponse>(testContext, GetTokenCallback), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, SharedErrorCallback), testContext);
+            if (PlayFabClientAPI.IsClientLoggedIn())
+                testContext.Fail("Cannot get a title token if the client is logged in.");
+
+            PlayFabEntityAPI.GetEntityToken(null, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.GetEntityTokenResponse>(testContext, OnGetTitleEntityToken), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
         }
-        private void GetTokenCallback(PlayFab.EntityModels.GetEntityTokenResponse result)
+        public void OnGetTitleEntityToken(EntityModels.GetEntityTokenResponse result)
         {
             var testContext = (UUnitTestContext)result.CustomData;
 
-            _playerEntityId = result.EntityId;
-            testContext.StringEquals(PlayFab.EntityModels.EntityTypes.title_player_account.ToString(), result.EntityType, "GetEntityToken EntityType not expected: " + result.EntityType);
+            testContext.False(PlayFabClientAPI.IsClientLoggedIn());
+            testContext.ObjEquals(result.EntityId, PlayFabSettings.TitleId);
+            testContext.StringEquals(result.EntityType, EntityModels.EntityTypes.title.ToString());
 
-            testContext.True(PlayFabClientAPI.IsClientLoggedIn(), "Get Entity Token failed");
-            testContext.EndTest(UUnitFinishState.PASSED, PlayFabSettings.TitleId + ", " + result.EntityToken);
+            testContext.EndTest(UUnitFinishState.PASSED, null);
+        }
+
+        [UUnitTest]
+        public void GenerateCharacters(UUnitTestContext testContext)
+        {
+            var request = new ServerModels.ListUsersCharactersRequest { PlayFabId = _playFabId };
+            PlayFabServerAPI.GetAllUsersCharacters(request, PlayFabUUnitUtils.ApiActionWrapper<ServerModels.ListUsersCharactersResult>(testContext, OnGetCharacters), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        private void OnGetCharacters(ServerModels.ListUsersCharactersResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+
+            var needChars = new HashSet<string>(_characterNames);
+            foreach (var pfChar in result.Characters)
+                if (needChars.Remove(pfChar.CharacterName))
+                    _charIdbyName[pfChar.CharacterName] = pfChar.CharacterId;
+
+            if (needChars.Count > 0)
+            {
+                foreach (var eachCharName in needChars)
+                {
+                    var request = new ServerModels.GrantCharacterToUserRequest { PlayFabId = _playFabId, CharacterName = eachCharName, CharacterType = "test" };
+                    PlayFabServerAPI.GrantCharacterToUser(request, PlayFabUUnitUtils.ApiActionWrapper<ServerModels.GrantCharacterToUserResult>(testContext, OnGrantChar), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+                }
+            }
+            else
+            {
+                testContext.EndTest(UUnitFinishState.PASSED, null);
+            }
+        }
+        private void OnGrantChar(ServerModels.GrantCharacterToUserResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+            var request = new ServerModels.ListUsersCharactersRequest { PlayFabId = _playFabId };
+            PlayFabServerAPI.GetAllUsersCharacters(request, PlayFabUUnitUtils.ApiActionWrapper<ServerModels.ListUsersCharactersResult>(testContext, OnGetCharacters), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+
+        // [UUnitTest]
+        public void CleanGuildMemberships(UUnitTestContext testContext)
+        {
+            _testInteger = _charIdbyName.Count + 1;
+
+            // Get the 
+            var request = new EntityModels.ListMembershipRequest
+            {
+                EntityId = _playerEntityId,
+                EntityType = EntityModels.EntityTypes.title_player_account
+            };
+            PlayFabEntityAPI.ListMembership(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.ListMembershipResponse>(testContext, ClearGroupsForEntity), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+
+            foreach (var eachPair in _charIdbyName)
+            {
+                request.EntityId = eachPair.Value;
+                request.EntityType = EntityModels.EntityTypes.character;
+                PlayFabEntityAPI.ListMembership(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.ListMembershipResponse>(testContext, ClearGroupsForEntity), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+            }
+        }
+        private void ClearGroupsForEntity(EntityModels.ListMembershipResponse result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+
+            foreach (var group in result.Groups)
+            {
+                var request = new EntityModels.DeleteGroupRequest { GroupId = group.GroupId };
+                PlayFabEntityAPI.DeleteGroup(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.EmptyResult>(testContext, OnClearGroup), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+            }
+
+            if (result.Groups.Count == 0)
+                OnClearGroup(new EntityModels.EmptyResult { CustomData = testContext });
+        }
+        private void OnClearGroup(EntityModels.EmptyResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+
+            _testInteger--;
+            if (_testInteger == 0)
+                testContext.EndTest(UUnitFinishState.PASSED, null);
+            else if (_testInteger < 0)
+                testContext.Fail("Failure with the test itself: More callbacks received, than API calls expected to be made");
+        }
+
+        [UUnitTest]
+        public void CreateGroup(UUnitTestContext testContext)
+        {
+            var request = new EntityModels.CreateGroupRequest { GroupName = TestGroupName, EntityId = _charIdbyName["Ragnar"], EntityType = EntityModels.EntityTypes.character };
+            PlayFabEntityAPI.CreateGroup(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.GetGroupResponse>(testContext, OnCreateGroup), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        private void OnCreateGroup(EntityModels.GetGroupResponse result)
+        {
+            _groupId = result.GroupId;
+
+            var testContext = (UUnitTestContext)result.CustomData;
+            testContext.EndTest(UUnitFinishState.PASSED, _groupId);
+        }
+
+        [UUnitTest]
+        public void InviteAndAccept(UUnitTestContext testContext)
+        {
+            var request = new EntityModels.InviteToGroupRequest { GroupId = _groupId, EntityId = _charIdbyName["Alena"], EntityType = EntityModels.EntityTypes.character };
+            PlayFabEntityAPI.InviteToGroup(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.GetGroupInviteResponse>(testContext, OnInvite), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        public void OnInvite(EntityModels.GetGroupInviteResponse result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+
+            var request = new EntityModels.AcceptGroupInvitationRequest { GroupId = _groupId, EntityId = _charIdbyName["Alena"], EntityType = EntityModels.EntityTypes.character };
+            PlayFabEntityAPI.AcceptGroupInvitation(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.EmptyResult>(testContext, OnAcceptInvite), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        public void OnAcceptInvite(EntityModels.EmptyResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+            testContext.EndTest(UUnitFinishState.PASSED, _charIdbyName["Alena"]);
+        }
+
+        [UUnitTest]
+        public void ApplyAndAccept(UUnitTestContext testContext)
+        {
+            var request = new EntityModels.ApplyToGroupRequest { GroupId = _groupId, EntityId = _charIdbyName["Brey"], EntityType = EntityModels.EntityTypes.character };
+            PlayFabEntityAPI.ApplyToGroup(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.GetGroupApplicationResponse>(testContext, OnApply), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        public void OnApply(EntityModels.GetGroupApplicationResponse result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+
+            var request = new EntityModels.AcceptGroupApplicationRequest { GroupId = _groupId, EntityId = _charIdbyName["Brey"], EntityType = EntityModels.EntityTypes.character };
+            PlayFabEntityAPI.AcceptGroupApplication(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.EmptyResult>(testContext, OnAcceptInvite), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        public void OnAcceptApplication(EntityModels.EmptyResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+            testContext.EndTest(UUnitFinishState.PASSED, _charIdbyName["Brey"]);
+        }
+
+        [UUnitTest]
+        public void KickMember(UUnitTestContext testContext)
+        {
+            var kickList = new List<EntityModels.EntityTypeId>
+            {
+                new EntityModels.EntityTypeId { EntityType = EntityModels.EntityTypes.character, EntityId = _charIdbyName["Alena"] },
+                new EntityModels.EntityTypeId { EntityType = EntityModels.EntityTypes.character, EntityId = _charIdbyName["Brey"] },
+            };
+            var request = new EntityModels.RemoveMembersRequest { GroupId = _groupId, Members = kickList };
+            PlayFabEntityAPI.RemoveMembers(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.EmptyResult>(testContext, OnRemoveMembers), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        private void OnRemoveMembers(EntityModels.EmptyResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+            testContext.EndTest(UUnitFinishState.PASSED, null);
+        }
+
+        [UUnitTest]
+        public void FinalDeleteGroup(UUnitTestContext testContext)
+        {
+            var request = new EntityModels.DeleteGroupRequest { GroupId = _groupId };
+            PlayFabEntityAPI.DeleteGroup(request, PlayFabUUnitUtils.ApiActionWrapper<EntityModels.EmptyResult>(testContext, OnDelGroup), PlayFabUUnitUtils.ApiActionWrapper<PlayFabError>(testContext, OnSharedError), testContext);
+        }
+        private void OnDelGroup(EntityModels.EmptyResult result)
+        {
+            var testContext = (UUnitTestContext)result.CustomData;
+            testContext.EndTest(UUnitFinishState.PASSED, _groupId);
         }
     }
 }
