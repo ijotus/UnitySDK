@@ -18,7 +18,7 @@ namespace PlayFab.Events
         public event PlayFabRequestEvent<BlockEntityRequest> OnEntityBlockEntityRequestEvent;
         public event PlayFabResultEvent<EmptyResult> OnEntityBlockEntityResultEvent;
         public event PlayFabRequestEvent<CreateGroupRequest> OnEntityCreateGroupRequestEvent;
-        public event PlayFabResultEvent<GetGroupResponse> OnEntityCreateGroupResultEvent;
+        public event PlayFabResultEvent<CreateGroupResponse> OnEntityCreateGroupResultEvent;
         public event PlayFabRequestEvent<CreateGroupRoleRequest> OnEntityCreateRoleRequestEvent;
         public event PlayFabResultEvent<CreateGroupRoleResponse> OnEntityCreateRoleResultEvent;
         public event PlayFabRequestEvent<DeleteFilesRequest> OnEntityDeleteFilesRequestEvent;
@@ -42,14 +42,14 @@ namespace PlayFab.Events
         public event PlayFabRequestEvent<InitiateFileUploadsRequest> OnEntityInitiateFileUploadsRequestEvent;
         public event PlayFabResultEvent<InitiateFileUploadsResponse> OnEntityInitiateFileUploadsResultEvent;
         public event PlayFabRequestEvent<InviteToGroupRequest> OnEntityInviteToGroupRequestEvent;
-        public event PlayFabResultEvent<GetGroupInviteResponse> OnEntityInviteToGroupResultEvent;
+        public event PlayFabResultEvent<InviteToGroupResponse> OnEntityInviteToGroupResultEvent;
         public event PlayFabRequestEvent<IsMemberRequest> OnEntityIsMemberRequestEvent;
         public event PlayFabResultEvent<IsMemberResponse> OnEntityIsMemberResultEvent;
         public event PlayFabRequestEvent<ListGroupBlockRequest> OnEntityListBlocksRequestEvent;
         public event PlayFabResultEvent<ListGroupBlockResponse> OnEntityListBlocksResultEvent;
         public event PlayFabRequestEvent<ListGroupApplicationsRequest> OnEntityListGroupApplicationsRequestEvent;
         public event PlayFabResultEvent<ListGroupApplicationResponse> OnEntityListGroupApplicationsResultEvent;
-        public event PlayFabRequestEvent<ListGroupInviteRequest> OnEntityListGroupInvitationsRequestEvent;
+        public event PlayFabRequestEvent<ListGroupInvitationRequest> OnEntityListGroupInvitationsRequestEvent;
         public event PlayFabResultEvent<ListGroupInviteResponse> OnEntityListGroupInvitationsResultEvent;
         public event PlayFabRequestEvent<ListGroupMembersRequest> OnEntityListGroupMembersRequestEvent;
         public event PlayFabResultEvent<ListGroupMembersResponse> OnEntityListGroupMembersResultEvent;

@@ -146,7 +146,6 @@ MonoBehaviour:
   textDisplay: {fileID: 0}
   filter: 
   postResultsToCloudscript: 1
-  testTitleDataAsset: {fileID: 0}
 --- !u!4 &442166092
 Transform:
   m_ObjectHideFlags: 0

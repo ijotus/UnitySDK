@@ -214,15 +214,9 @@ namespace PlayFab.Internal
             var logRes = result as ClientModels.LoginResult;
             var regRes = result as ClientModels.RegisterPlayFabUserResult;
             if (logRes != null)
-            {
                 _internalHttp.AuthKey = logRes.SessionTicket;
-                if (logRes.EntityToken != null)
-                    _internalHttp.EntityToken = logRes.EntityToken.EntityToken;
-            }
             else if (regRes != null)
-            {
                 _internalHttp.AuthKey = regRes.SessionTicket;
-            }
 #endif
         }
 
@@ -308,7 +302,7 @@ namespace PlayFab.Internal
             }
         }
 
-        protected internal static PlayFabError GeneratePlayFabError(PlayFabRequestCommon request, string apiEndpoint, string json, object customData)
+        protected internal static PlayFabError GeneratePlayFabError(string apiEndpoint, string json, object customData)
         {
             JsonObject errorDict = null;
             Dictionary<string, List<string>> errorDetails = null;
@@ -327,7 +321,6 @@ namespace PlayFab.Internal
 
             return new PlayFabError
             {
-                Request = request,
                 ApiEndpoint = apiEndpoint,
                 HttpCode = errorDict != null && errorDict.ContainsKey("code") ? Convert.ToInt32(errorDict["code"]) : 400,
                 HttpStatus = errorDict != null && errorDict.ContainsKey("status") ? (string)errorDict["status"] : "BadRequest",

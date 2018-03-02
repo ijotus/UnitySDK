@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using PlayFab.SharedModels;
 
 namespace PlayFab
 {
@@ -377,7 +376,6 @@ namespace PlayFab
 
     public class PlayFabError
     {
-        public PlayFabRequestCommon Request;
         public string ApiEndpoint;
         public int HttpCode;
         public string HttpStatus;
@@ -406,7 +404,7 @@ namespace PlayFab
             if (_tempSb == null)
                 _tempSb = new StringBuilder();
             _tempSb.Length = 0;
-            _tempSb.Append(ApiEndpoint).Append(" (").Append(Error).Append("): ").Append(ErrorMessage);
+            _tempSb.Append(ApiEndpoint).Append(": ").Append(ErrorMessage);
             if (ErrorDetails != null)
                 foreach (var pair in ErrorDetails)
                     foreach (var msg in pair.Value)

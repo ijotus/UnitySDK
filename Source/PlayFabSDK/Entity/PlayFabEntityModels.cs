@@ -162,6 +162,39 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
+    public class CreateGroupResponse : PlayFabResultCommon
+    {
+        /// <summary>
+        /// The ID of the administrator role for the group.
+        /// </summary>
+        public string AdminRoleId;
+        /// <summary>
+        /// The server date and time the group was created.
+        /// </summary>
+        public DateTime Created;
+        /// <summary>
+        /// ID for the group.
+        /// </summary>
+        public string GroupId;
+        /// <summary>
+        /// The name of the group.
+        /// </summary>
+        public string GroupName;
+        /// <summary>
+        /// The ID of the default member role for the group.
+        /// </summary>
+        public string MemberRoleId;
+        /// <summary>
+        /// The current version of the profile, can be used for concurrency control during updates.
+        /// </summary>
+        public int ProfileVersion;
+        /// <summary>
+        /// The list of roles and names that belong to the group.
+        /// </summary>
+        public Dictionary<string,string> Roles;
+    }
+
+    [Serializable]
     public class CreateGroupRoleRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -636,39 +669,6 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class GetGroupInviteResponse : PlayFabResultCommon
-    {
-        /// <summary>
-        /// ID of the entity that is invited
-        /// </summary>
-        public string EntityId;
-        /// <summary>
-        /// Type of entity that is invited
-        /// </summary>
-        public string EntityType;
-        /// <summary>
-        /// When the invitation will expire and be deleted
-        /// </summary>
-        public DateTime Expires;
-        /// <summary>
-        /// ID of the group that the entity invited to
-        /// </summary>
-        public string GroupId;
-        /// <summary>
-        /// ID of the entity that created the invitation
-        /// </summary>
-        public string InvitedById;
-        /// <summary>
-        /// Type of the entity that created the invitation
-        /// </summary>
-        public string InvitedByType;
-        /// <summary>
-        /// ID of the role in the group to assign the user to.
-        /// </summary>
-        public string RoleId;
-    }
-
-    [Serializable]
     public class GetGroupRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -937,6 +937,39 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
+    public class InviteToGroupResponse : PlayFabResultCommon
+    {
+        /// <summary>
+        /// ID of the entity that is invited
+        /// </summary>
+        public string EntityId;
+        /// <summary>
+        /// Type of entity that is invited
+        /// </summary>
+        public string EntityType;
+        /// <summary>
+        /// When the invitation will expire and be deleted
+        /// </summary>
+        public DateTime Expires;
+        /// <summary>
+        /// ID of the group that the entity invited to
+        /// </summary>
+        public string GroupId;
+        /// <summary>
+        /// ID of the entity that created the invitation
+        /// </summary>
+        public string InvitedById;
+        /// <summary>
+        /// Type of the entity that created the invitation
+        /// </summary>
+        public string InvitedByType;
+        /// <summary>
+        /// ID of the role in the group to assign the user to.
+        /// </summary>
+        public string RoleId;
+    }
+
+    [Serializable]
     public class IsMemberRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -1004,7 +1037,7 @@ namespace PlayFab.EntityModels
     }
 
     [Serializable]
-    public class ListGroupInviteRequest : PlayFabRequestCommon
+    public class ListGroupInvitationRequest : PlayFabRequestCommon
     {
         /// <summary>
         /// ID of the group to list invitations of

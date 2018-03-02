@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Linq;
 using PlayFab.Json;
 using PlayFab.SharedModels;
 using UnityEngine;
@@ -44,17 +43,8 @@ namespace PlayFab.Internal
             }
 #endif
 
-            // Debug.LogFormat("Posting to {1}:\nRequest:\n{0}\nHeaders\n{2}", JsonWrapper.SerializeObject(reqContainer.ApiRequest), reqContainer.FullUrl, JsonWrapper.SerializeObject(reqContainer.RequestHeaders));
-            WWW www;
-            try
-            {
-                www = new WWW(reqContainer.FullUrl, reqContainer.Payload, reqContainer.RequestHeaders);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("eff!");
-                throw;
-            }
+            //Debug.LogFormat("Posting {0} to Url: {1}", req.Trim(), url);
+            var www = new WWW(reqContainer.FullUrl, reqContainer.Payload, reqContainer.RequestHeaders);
 
 #if PLAYFAB_REQUEST_TIMING
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -115,7 +105,7 @@ namespace PlayFab.Internal
                     {
                         if (reqContainer.ErrorCallback != null)
                         {
-                            reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiRequest, reqContainer.ApiEndpoint, response, reqContainer.CustomData);
+                            reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiEndpoint, response, reqContainer.CustomData);
                             PlayFabHttp.SendErrorEvent(reqContainer.ApiRequest, reqContainer.Error);
                             reqContainer.ErrorCallback(reqContainer.Error);
                         }
@@ -132,7 +122,7 @@ namespace PlayFab.Internal
                 reqContainer.JsonResponse = errorCb;
                 if (reqContainer.ErrorCallback != null)
                 {
-                    reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiRequest, reqContainer.ApiEndpoint, reqContainer.JsonResponse, reqContainer.CustomData);
+                    reqContainer.Error = PlayFabHttp.GeneratePlayFabError(reqContainer.ApiEndpoint, reqContainer.JsonResponse, reqContainer.CustomData);
                     PlayFabHttp.SendErrorEvent(reqContainer.ApiRequest, reqContainer.Error);
                     reqContainer.ErrorCallback(reqContainer.Error);
                 }

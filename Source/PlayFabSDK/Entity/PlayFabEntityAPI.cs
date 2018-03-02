@@ -84,7 +84,7 @@ namespace PlayFab
         /// <summary>
         /// Creates a new group.
         /// </summary>
-        public static void CreateGroup(CreateGroupRequest request, Action<GetGroupResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        public static void CreateGroup(CreateGroupRequest request, Action<CreateGroupResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
 
             PlayFabHttp.MakeApiCall("/Group/CreateGroup", request, AuthType.EntityToken, resultCallback, errorCallback, customData, extraHeaders);
@@ -199,7 +199,7 @@ namespace PlayFab
         /// <summary>
         /// Invites a player to join a group
         /// </summary>
-        public static void InviteToGroup(InviteToGroupRequest request, Action<GetGroupInviteResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        public static void InviteToGroup(InviteToGroupRequest request, Action<InviteToGroupResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
 
             PlayFabHttp.MakeApiCall("/Group/InviteToGroup", request, AuthType.EntityToken, resultCallback, errorCallback, customData, extraHeaders);
@@ -235,7 +235,7 @@ namespace PlayFab
         /// <summary>
         /// Lists all outstanding invitations for a group
         /// </summary>
-        public static void ListGroupInvitations(ListGroupInviteRequest request, Action<ListGroupInviteResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        public static void ListGroupInvitations(ListGroupInvitationRequest request, Action<ListGroupInviteResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
 
             PlayFabHttp.MakeApiCall("/Group/ListGroupInvitations", request, AuthType.EntityToken, resultCallback, errorCallback, customData, extraHeaders);
